@@ -1,141 +1,20 @@
-import { useEffect, useMemo, useReducer } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import Display from './Display.jsx'
 import Keypad from './Keypad.jsx'
-import { evaluateExpression, formatResult } from '../utils/calculate.js'
-
-const DISPLAY_OPS = { '*': '\u00D7', '/': '\u00F7', '-': '\u2212' }
-const OP_CHARS = new Set(['+', '\u00D7', '\u00F7', '\u2212', '*', '/', '-', '^'])
-
-const initialState = {
-  expr: '',
-  result: '',
-  hasResult: false,
-  overwrite: false,
-  error: false,
-  history: [],
-  mode: 'basic',
-  angle: 'deg',
-}
-
-function reducer(state, action) {
-  switch (action.type) {
-    case 'INPUT': {
-      const { key } = action
-      if (state.error || state.overwrite) {
-        return { ...state, expr: key, result: '', hasResult: false, overwrite: false, error: false }
-      }
-      if (key === '.') {
-        const segment = state.expr.split(/[+\u00D7\u00F7\u2212*/\-^()!]/).pop()
-        if (segment.includes('.')) return state
-      }
-      return { ...state, expr: state.expr + key, error: false }
-    }
-
-    case 'OPERATOR': {
-      const op = DISPLAY_OPS[action.op] ?? action.op
-      if (state.error) {
-        return { ...state, expr: '', hasResult: false, error: false }
-      }
-      let base
-      if (state.overwrite && state.result !== '') {
-        base = state.result
-      } else {
-        base = state.expr || '0'
-      }
-      const last = base[base.length - 1]
-      const expr = last && OP_CHARS.has(last) ? base.slice(0, -1) + op : base + op
-      return { ...state, expr, result: '', hasResult: false, overwrite: false }
-    }
-
-    case 'EQUALS': {
-      const expr = state.expr
-      const res = evaluateExpression(expr, state.angle)
-      if (!res.ok) {
-        return { ...state, result: '', hasResult: true, overwrite: false, error: true }
-      }
-      const text = formatResult(res.value)
-      const history = [{ expr, result: text }, ...state.history].slice(0, 12)
-      return { ...state, result: text, hasResult: true, overwrite: true, error: false, history }
-    }
-
-    case 'CLEAR':
-      return { ...state, expr: '', result: '', hasResult: false, overwrite: false, error: false }
-
-    case 'BACKSPACE': {
-      if (state.error || state.overwrite) {
-        return { ...state, expr: '', result: '', hasResult: false, overwrite: false, error: false }
-      }
-      return { ...state, expr: state.expr.slice(0, -1) }
-    }
-
-    case 'MODE':
-      return { ...state, mode: action.mode }
-
-    case 'ANGLE':
-      return { ...state, angle: state.angle === 'deg' ? 'rad' : 'deg' }
-
-    case 'WRAP': {
-      const res = evaluateExpression(state.expr || state.result, state.angle)
-      if (!res.ok) return state
-      const v = res.value
-      if (action.kind === 'negate') {
-        const text = v === 0 ? '0' : v < 0 ? formatResult(-v) : `-${formatResult(v)}`
-        return { ...state, expr: text, result: '', hasResult: false, overwrite: false, error: false }
-      }
-      if (action.kind === 'reciprocal') {
-        if (v === 0) {
-          return { ...state, result: 'Error', hasResult: true, error: true }
-        }
-        return {
-          ...state,
-          expr: `1/(${formatResult(v)})`,
-          result: '',
-          hasResult: false,
-          overwrite: false,
-          error: false,
-        }
-      }
-      return state
-    }
-
-    case 'HISTORY_USE': {
-      const { expr, result } = action.entry
-      if (expr && expr !== result) return { ...state, expr }
-      return { ...state, expr: result, result, hasResult: true, overwrite: false, error: false }
-    }
-
-    case 'HISTORY_CLEAR':
-      return { ...state, history: [] }
-
-    default:
-      return state
-  }
-}
+import { initialState, reducer } from '../utils/calculatorState.js'
 
 function Calculator() {
   const [state, dispatch] = useReducer(reducer, initialState)
+  const [happy, setHappy] = useState(false)
   const { expr, result, hasResult, error, history, mode, angle } = state
-
-  const preview = useMemo(() => evaluateExpression(expr, angle), [expr, angle])
-
-  const liveEval = expr.trim() !== '' && !hasResult
 
   let displayText
   let isError = false
-  if (error && expr.trim() !== '') {
-    displayText = 'Error'
-    isError = true
-  } else if (hasResult && result !== '') {
-    displayText = result
-  } else if (liveEval) {
-    if (preview.ok) {
-      displayText = formatResult(preview.value)
-    } else {
-      displayText = 'Error'
-      isError = true
-    }
+  if (hasResult) {
+    displayText = error ? 'Error' : result
+    isError = error
   } else {
-    displayText = '0'
+    displayText = expr.trim() === '' ? '0' : expr
   }
 
   const handlePress = (type, payload) => {
@@ -148,6 +27,8 @@ function Calculator() {
         break
       case 'equals':
         dispatch({ type: 'EQUALS' })
+        setHappy(true)
+        window.setTimeout(() => setHappy(false), 700)
         break
       case 'clear':
         dispatch({ type: 'CLEAR' })
@@ -201,9 +82,11 @@ function Calculator() {
       onClick={() => dispatch({ type: 'MODE', mode: m })}
       aria-pressed={mode === m}
       className={[
-        'flex-1 rounded-xl px-3 py-1.5 text-xs font-semibold uppercase tracking-widest transition duration-150',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400',
-        mode === m ? 'bg-blue-500 text-white' : 'bg-white/5 text-white/50 hover:bg-white/10',
+        'flex-1 rounded-full border-[3px] border-[#4E3B31] px-3 py-1 font-display text-xs font-bold uppercase tracking-widest transition-all duration-150',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8A8A] focus-visible:ring-offset-2',
+        mode === m
+          ? 'translate-y-[1px] bg-butter text-[#4E3B31] shadow-[0_2px_0_0_#4E3B31]'
+          : 'bg-white/70 text-[#B089A0] hover:bg-white',
       ].join(' ')}
     >
       {label}
@@ -213,36 +96,63 @@ function Calculator() {
   return (
     <div className="relative w-full max-w-xs sm:max-w-sm">
       <div
-        className="rounded-[2rem] border border-white/20 bg-white/10 p-5 backdrop-blur-xl sm:p-6"
-        style={{ boxShadow: '0 25px 50px -12px rgba(59,130,246,0.25)' }}
+        className="rounded-[2.5rem] border-[3px] border-[#4E3B31] bg-[#FFF9EE] p-5 sm:p-6"
+        style={{ boxShadow: '0 18px 35px -12px rgba(184, 122, 160, 0.45)' }}
       >
-        <div className="mb-4 flex gap-2">{modeBtn('basic', 'Basic')}{modeBtn('scientific', 'Sci')}</div>
-        <Display expression={expr} display={displayText} angleMode={angle} isError={isError} />
+        <div className="mb-1 flex items-center justify-center">
+          <div className="flex items-center gap-2 rounded-full border-[3px] border-[#4E3B31] bg-white px-4 py-2">
+            {happy ? (
+              <span className="face-happy inline-flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full border-[2px] border-[#4E3B31] bg-[#4E3B31]" />
+                <span className="h-1.5 w-3 rounded-b-full border-2 border-t-0 border-[#4E3B31]" />
+                <span className="h-2.5 w-2.5 rounded-full border-[2px] border-[#4E3B31] bg-[#4E3B31]" />
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#4E3B31]" />
+                <span className="text-[15px] leading-none text-[#4E3B31]">♡</span>
+                <span className="h-2.5 w-2.5 rounded-full bg-[#4E3B31]" />
+              </span>
+            )}
+            <span className="inline-flex items-start gap-1.5">
+              <span className="h-2 w-1 rounded-full bg-[#FFB3C8]" />
+              <span className="h-2 w-1 rounded-full bg-[#FFB3C8]" />
+            </span>
+          </div>
+        </div>
+
+        <div className="mb-4 mt-3 flex gap-2">{modeBtn('basic', 'Basic')}{modeBtn('scientific', 'Sci')}</div>
+        <Display expression={expr} display={displayText} isError={isError} />
+
+        <div className="mb-4 flex justify-between text-xs font-medium text-[#B089A0]">
+          <span className="rounded-full bg-white/70 px-2 py-0.5">stress na ko ⊙‿⊙</span>
+        </div>
+
         <Keypad mode={mode} angle={angle} press={handlePress} />
       </div>
 
       {history.length > 0 && (
-        <div className="mt-4 rounded-2xl border border-white/15 bg-white/5 p-4 backdrop-blur-lg">
+        <div className="mt-4 rounded-3xl border-[3px] border-[#4E3B31] bg-[#FFF9EE] p-4 shadow-[0_10px_25px_-10px_rgba(184,122,160,0.45)]">
           <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-sm font-bold tracking-tight text-white/70">History</h2>
+            <h2 className="font-display text-sm font-bold tracking-tight text-[#4E3B31]">✦ history</h2>
             <button
               type="button"
               onClick={() => dispatch({ type: 'HISTORY_CLEAR' })}
-              className="rounded-lg bg-white/5 px-2 py-1 text-[11px] font-medium text-white/50 transition duration-150 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+              className="rounded-lg border-2 border-[#4E3B31] bg-blush px-2 py-1 text-[11px] font-semibold text-[#B06A7E] transition duration-150 hover:bg-blush-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8A8A]"
             >
               Clear
             </button>
           </div>
-          <ul className="max-h-40 space-y-1 overflow-y-auto">
+          <ul className="no-scrollbar max-h-40 space-y-1 overflow-y-auto">
             {history.map((entry, idx) => (
               <li key={idx}>
                 <button
                   type="button"
                   onClick={() => dispatch({ type: 'HISTORY_USE', entry })}
-                  className="flex w-full items-baseline justify-between gap-3 rounded-lg px-2 py-1 text-right transition duration-150 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                  className="flex w-full items-baseline justify-between gap-3 rounded-xl border-2 border-transparent px-2 py-1 text-right transition duration-150 hover:border-[#4E3B31]/30 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8A8A]"
                 >
-                  <span className="truncate text-xs text-white/40">{entry.expr}</span>
-                  <span className="shrink-0 text-sm font-medium text-white/80">{entry.result}</span>
+                  <span className="truncate text-xs text-[#B089A0]">{entry.expr}</span>
+                  <span className="shrink-0 text-sm font-semibold text-[#4E3B31]">{entry.result}</span>
                 </button>
               </li>
             ))}
