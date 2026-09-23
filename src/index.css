@@ -25,6 +25,8 @@ body,
 
 body {
   margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

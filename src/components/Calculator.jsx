@@ -1,11 +1,18 @@
-import { useEffect, useReducer, useState } from 'react'
+import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
 import Display from './Display.jsx'
 import Keypad from './Keypad.jsx'
 import { initialState, reducer } from '../utils/calculatorState.js'
 
+const KEY_GAP = 12
+const COLS = 4
+
 function Calculator() {
   const [state, dispatch] = useReducer(reducer, initialState)
   const [happy, setHappy] = useState(false)
+  const [fitW, setFitW] = useState(0)
+  const spaceRef = useRef(null)
+  const cardRef = useRef(null)
+  const historyRef = useRef(null)
   const { expr, result, hasResult, error, history, mode, angle } = state
 
   let displayText
@@ -76,6 +83,50 @@ function Calculator() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
+  // Fit the whole calculator to the available screen, no scrolling, responsive.
+  useLayoutEffect(() => {
+    const space = spaceRef.current
+    const card = cardRef.current
+    if (!space || !card) return undefined
+
+    const measure = () => {
+      const keypad = card.querySelector('[data-keypad]')
+      if (!keypad) return
+
+      const availW = space.clientWidth
+      const availH = space.clientHeight
+      const desktop = window.matchMedia('(min-width: 1024px)').matches
+      const rows = mode === 'scientific' ? 9 : 5
+
+      const cardRect = card.getBoundingClientRect()
+      const keypadRect = keypad.getBoundingClientRect()
+      const W0 = cardRect.width
+      const chrome = cardRect.height - keypadRect.height
+      const col0 = (keypadRect.height - (rows - 1) * KEY_GAP) / rows
+
+      const hist = historyRef.current
+      const histH = hist ? hist.getBoundingClientRect().height + 16 : 0
+      const histW = desktop && hist ? hist.getBoundingClientRect().width + 16 : 0
+
+      const budget = Math.max(0, availH - chrome - (desktop ? 0 : histH))
+      const colT = (budget - (rows - 1) * KEY_GAP) / rows
+
+      const maxCardW = Math.max(0, availW - histW)
+      let W = W0 + COLS * (colT - col0)
+      W = Math.min(W, maxCardW)
+      W = Math.max(W, Math.min(220, maxCardW))
+      W = Math.min(W, maxCardW)
+
+      const rowW = desktop ? W + histW : W
+      setFitW(Math.min(availW, Math.max(0, rowW)))
+    }
+
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(space)
+    return () => observer.disconnect()
+  }, [mode, history.length])
+
   const modeBtn = (m, label) => (
     <button
       type="button"
@@ -94,9 +145,17 @@ function Calculator() {
   )
 
   return (
-    <div className="relative w-full max-w-xs sm:max-w-sm">
+    <div
+      ref={spaceRef}
+      className="no-scrollbar flex h-full min-h-0 w-full items-center justify-center overflow-y-auto"
+    >
       <div
-        className="rounded-[2.5rem] border-[3px] border-[#4E3B31] bg-[#FFF9EE] p-5 sm:p-6"
+        className="flex w-full flex-col items-center gap-4 lg:flex-row lg:items-center"
+        style={fitW > 0 ? { width: `${fitW}px` } : undefined}
+      >
+        <div ref={cardRef} className="order-1 w-full lg:order-2">
+          <div
+            className="w-full rounded-[2.5rem] border-[3px] border-[#4E3B31] bg-[#FFF9EE] p-5 sm:p-6"
         style={{ boxShadow: '0 18px 35px -12px rgba(184, 122, 160, 0.45)' }}
       >
         <div className="mb-1 flex items-center justify-center">
@@ -114,10 +173,6 @@ function Calculator() {
                 <span className="h-2.5 w-2.5 rounded-full bg-[#4E3B31]" />
               </span>
             )}
-            <span className="inline-flex items-start gap-1.5">
-              <span className="h-2 w-1 rounded-full bg-[#FFB3C8]" />
-              <span className="h-2 w-1 rounded-full bg-[#FFB3C8]" />
-            </span>
           </div>
         </div>
 
@@ -129,10 +184,12 @@ function Calculator() {
         </div>
 
         <Keypad mode={mode} angle={angle} press={handlePress} />
+        </div>
       </div>
 
       {history.length > 0 && (
-        <div className="mt-4 rounded-3xl border-[3px] border-[#4E3B31] bg-[#FFF9EE] p-4 shadow-[0_10px_25px_-10px_rgba(184,122,160,0.45)]">
+        <div ref={historyRef} className="order-2 w-full lg:order-1 lg:max-w-none lg:w-64">
+          <div className="mt-4 w-full rounded-3xl border-[3px] border-[#4E3B31] bg-[#FFF9EE] p-4 shadow-[0_10px_25px_-10px_rgba(184,122,160,0.45)] lg:mt-0">
           <div className="mb-2 flex items-center justify-between">
             <h2 className="font-display text-sm font-bold tracking-tight text-[#4E3B31]">✦ history</h2>
             <button
@@ -157,8 +214,10 @@ function Calculator() {
               </li>
             ))}
           </ul>
+          </div>
         </div>
       )}
+      </div>
     </div>
   )
 }

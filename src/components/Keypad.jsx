@@ -91,7 +91,7 @@ function Keypad({ mode, angle, press }) {
   const angleActive = angle === 'deg'
 
   return (
-    <div className="space-y-3">
+    <div data-keypad className="space-y-3">
       {mode === 'scientific' && (
         <div className="space-y-3">
           {SCI_ROWS.map((row, idx) => (

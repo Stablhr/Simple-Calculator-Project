@@ -49,12 +49,12 @@ function Display({ expression, display, isError }) {
   }, [display])
 
   return (
-    <div className="mb-5 flex h-24 flex-col items-end justify-end rounded-3xl border-[3px] border-[#4E3B31] bg-sky-100 p-4 shadow-[0_4px_0_0_#4E3B31]">
+    <div className="mb-5 flex min-h-24 flex-col items-end justify-end rounded-3xl border-[3px] border-[#4E3B31] bg-sky-100 p-4 shadow-[0_4px_0_0_#4E3B31]">
       <div className="flex w-full items-end justify-between gap-2">
         <span className="text-lg leading-none" aria-hidden="true">
           🐰
         </span>
-        <p className="flex-1 truncate text-right text-sm font-medium text-[#8A9DB0] sm:text-base" aria-hidden="true">
+        <p className="flex-1 truncate text-right text-sm font-medium leading-normal text-[#8A9DB0] sm:text-base" aria-hidden="true">
           {expression || '\u00A0'}
         </p>
       </div>
@@ -62,7 +62,7 @@ function Display({ expression, display, isError }) {
         ref={textRef}
         aria-live="polite"
         className={
-          'font-display w-full overflow-hidden whitespace-nowrap text-right text-4xl font-bold leading-tight text-[#4E3B31] sm:text-5xl ' +
+          'font-display w-full whitespace-nowrap text-right text-4xl font-bold leading-normal text-[#4E3B31] sm:text-5xl ' +
           (flash ? 'result-animate ' : '') +
           (isError ? 'text-red-500' : '')
         }
