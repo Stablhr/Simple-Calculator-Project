@@ -5,16 +5,22 @@
   --font-display: 'Fredoka', 'Quicksand', system-ui, sans-serif;
   --font-sans: 'Fredoka', 'Quicksand', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
-  --color-mint: #bff3d1;
-  --color-mint-dark: #a9edc2;
-  --color-butter: #ffe29a;
-  --color-butter-dark: #ffd873;
-  --color-coral: #ff9a62;
-  --color-coral-dark: #ff8a50;
-  --color-blush: #ffd9e8;
-  --color-blush-dark: #ffc9de;
-  --color-lavender: #e4dbff;
-  --color-lavender-dark: #d8cbfd;
+  --color-bmo-body: #a8d8b9;
+  --color-bmo-body-dark: #93cb9f;
+  --color-bmo-ink: #1b2e2a;
+  --color-bmo-screen: #1b2e2a;
+  --color-bmo-screen-edge: #2e554b;
+  --color-bmo-glow: #c9f0d6;
+  --color-bmo-digit: #edf5ef;
+  --color-bmo-digit-dark: #dde9df;
+  --color-bmo-func: #a9c8bd;
+  --color-bmo-func-dark: #99b7ab;
+  --color-bmo-utility: #c9cfcb;
+  --color-bmo-utility-dark: #b8c0ba;
+  --color-bmo-operator: #d98b7a;
+  --color-bmo-operator-dark: #c97a68;
+  --color-bmo-equals: #f2d06b;
+  --color-bmo-equals-dark: #e7c355;
 }
 
 html,
@@ -35,10 +41,10 @@ body {
 .kawaii-bg {
   background: repeating-linear-gradient(
     90deg,
-    #ffe3ef 0px,
-    #ffe3ef 110px,
-    #ffd6e9 110px,
-    #ffd6e9 220px
+    #eaf4fb 0px,
+    #eaf4fb 110px,
+    #ddebf4 110px,
+    #ddebf4 220px
   );
 }
 
@@ -104,13 +110,13 @@ body {
   0%,
   100% {
     box-shadow:
-      0 4px 0 #c96b2e,
-      0 0 12px 2px rgba(255, 154, 98, 0.5);
+      0 4px 0 #1b2e2a,
+      0 0 12px 2px rgba(242, 208, 107, 0.5);
   }
   50% {
     box-shadow:
-      0 4px 0 #c96b2e,
-      0 0 20px 6px rgba(255, 154, 98, 0.75);
+      0 4px 0 #1b2e2a,
+      0 0 20px 6px rgba(242, 208, 107, 0.8);
   }
 }
 
