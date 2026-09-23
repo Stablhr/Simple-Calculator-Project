@@ -4,7 +4,7 @@ import Keypad from './Keypad.jsx'
 import { initialState, reducer } from '../utils/calculatorState.js'
 
 const KEY_GAP = 12
-const MIN_COL = 40
+const MIN_COL = 44
 
 function Calculator() {
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -95,11 +95,12 @@ function Calculator() {
 
       const availW = space.clientWidth
       const availH = space.clientHeight
-      const desktop = window.matchMedia('(min-width: 1024px)').matches
+      const histSide = window.matchMedia('(min-width: 768px)').matches
+      const sciSide = window.matchMedia('(min-width: 1024px)').matches
       const isSci = mode === 'scientific'
-      const sideBySide = isSci && desktop
+      const sideBySide = isSci && sciSide
       const cols = sideBySide ? 8 : 4
-      const rows = isSci && !desktop ? 9 : 5
+      const rows = isSci && !sciSide ? 9 : 5
 
       const cardRect = card.getBoundingClientRect()
       const keypadRect = keypad.getBoundingClientRect()
@@ -111,7 +112,7 @@ function Calculator() {
       let histW = 0
       if (hist) {
         const histRect = hist.getBoundingClientRect()
-        if (desktop) {
+        if (histSide) {
           histW = histRect.width + 16
         } else {
           histH = histRect.height + Math.max(0, histRect.top - cardRect.bottom)
@@ -127,7 +128,7 @@ function Calculator() {
       W = Math.max(W, Math.min(240, maxCardW))
       W = Math.min(W, maxCardW)
 
-      const rowW = desktop ? W + histW : W
+      const rowW = histSide ? W + histW : W
       setFitW(Math.min(availW, Math.max(0, rowW)))
     }
 
@@ -160,10 +161,10 @@ function Calculator() {
       className="no-scrollbar flex h-full min-h-0 w-full items-center justify-center overflow-y-auto"
     >
       <div
-        className="flex w-full flex-col items-center gap-4 transition-[width] duration-300 ease-in-out lg:flex-row lg:items-center"
+        className="flex w-full flex-col items-center gap-4 transition-[width] duration-300 ease-in-out md:flex-row md:items-center"
         style={fitW > 0 ? { width: `${fitW}px` } : undefined}
       >
-        <div ref={cardRef} className="order-1 w-full lg:order-2">
+        <div ref={cardRef} className="order-1 w-full md:order-2">
           <div
             className="w-full rounded-[2.5rem] border-[3px] border-[#1B2E2A] bg-bmo-body p-5 sm:p-6"
         style={{ boxShadow: '0 18px 35px -12px rgba(27, 46, 42, 0.35)' }}
@@ -198,25 +199,25 @@ function Calculator() {
       </div>
 
       {history.length > 0 && (
-        <div ref={historyRef} className="order-2 w-full lg:order-1 lg:max-w-none lg:w-64">
-          <div className="mt-4 w-full rounded-3xl border-[3px] border-[#1B2E2A] bg-bmo-body p-4 shadow-[0_10px_25px_-10px_rgba(184,122,160,0.45)] lg:mt-0">
+        <div ref={historyRef} className="order-2 w-full md:order-1 md:max-w-none md:w-64">
+          <div className="mt-4 w-full rounded-3xl border-[3px] border-[#1B2E2A] bg-bmo-body p-4 shadow-[0_10px_25px_-10px_rgba(27,46,42,0.45)] md:mt-0">
           <div className="mb-2 flex items-center justify-between">
             <h2 className="font-display text-sm font-bold tracking-tight text-[#1B2E2A]">✦ history</h2>
             <button
               type="button"
               onClick={() => dispatch({ type: 'HISTORY_CLEAR' })}
-              className="rounded-lg border-2 border-[#1B2E2A] bg-bmo-utility px-2 py-1 text-[11px] font-semibold text-bmo-ink transition duration-150 hover:bg-bmo-utility-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F2D06B]"
+              className="rounded-lg border-2 border-[#1B2E2A] bg-bmo-utility px-3 py-1.5 text-xs font-semibold text-bmo-ink transition duration-150 hover:bg-bmo-utility-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F2D06B]"
             >
               Clear
             </button>
           </div>
-          <ul className="no-scrollbar max-h-40 space-y-1 overflow-y-auto">
+          <ul className="no-scrollbar max-h-48 space-y-1.5 overflow-y-auto md:max-h-96">
             {history.map((entry, idx) => (
               <li key={idx}>
                 <button
                   type="button"
                   onClick={() => dispatch({ type: 'HISTORY_USE', entry })}
-                  className="flex w-full items-baseline justify-between gap-3 rounded-xl border-2 border-transparent px-2 py-1 text-right transition duration-150 hover:border-[#1B2E2A]/30 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F2D06B]"
+                  className="flex w-full items-baseline justify-between gap-3 rounded-xl border-2 border-transparent px-2.5 py-2 text-right transition duration-150 hover:border-[#1B2E2A]/30 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F2D06B]"
                 >
                   <span className="truncate text-xs text-[#5C7A72]">{entry.expr}</span>
                   <span className="shrink-0 text-sm font-semibold text-[#1B2E2A]">{entry.result}</span>

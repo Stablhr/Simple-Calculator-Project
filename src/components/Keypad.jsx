@@ -53,8 +53,9 @@ const MAIN_ROWS = [
     { label: '\u2212', key: '-', variant: 'operator' },
   ],
   [
-    { label: '0', key: '0', className: 'col-span-2', wide: true },
+    { label: '0', key: '0' },
     { label: '.', key: '.' },
+    { label: '+', key: '+', variant: 'operator' },
     { label: '=', key: '=', variant: 'equals' },
   ],
 ]
@@ -66,7 +67,7 @@ function Keypad({ mode, angle, press }) {
   const toVariant = ({ variant, key }) => {
     if (variant) return variant
     if (FUNC_KEYS.includes(key) || SCI_ACTIONS.has(key)) return 'function'
-    if ('*/-'.includes(key)) return 'operator'
+    if ('*/-+'.includes(key)) return 'operator'
     return 'digit'
   }
 
