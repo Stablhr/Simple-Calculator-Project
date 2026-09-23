@@ -4,7 +4,7 @@ import Keypad from './Keypad.jsx'
 import { initialState, reducer } from '../utils/calculatorState.js'
 
 const KEY_GAP = 12
-const COLS = 4
+const MIN_COL = 40
 
 function Calculator() {
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -96,25 +96,35 @@ function Calculator() {
       const availW = space.clientWidth
       const availH = space.clientHeight
       const desktop = window.matchMedia('(min-width: 1024px)').matches
-      const rows = mode === 'scientific' ? 9 : 5
+      const isSci = mode === 'scientific'
+      const sideBySide = isSci && desktop
+      const cols = sideBySide ? 8 : 4
+      const rows = isSci && !desktop ? 9 : 5
 
       const cardRect = card.getBoundingClientRect()
       const keypadRect = keypad.getBoundingClientRect()
-      const W0 = cardRect.width
       const chrome = cardRect.height - keypadRect.height
-      const col0 = (keypadRect.height - (rows - 1) * KEY_GAP) / rows
+      const hExtras = cardRect.width - keypadRect.width
 
       const hist = historyRef.current
-      const histH = hist ? hist.getBoundingClientRect().height + 16 : 0
-      const histW = desktop && hist ? hist.getBoundingClientRect().width + 16 : 0
+      let histH = 0
+      let histW = 0
+      if (hist) {
+        const histRect = hist.getBoundingClientRect()
+        if (desktop) {
+          histW = histRect.width + 16
+        } else {
+          histH = histRect.height + Math.max(0, histRect.top - cardRect.bottom)
+        }
+      }
 
-      const budget = Math.max(0, availH - chrome - (desktop ? 0 : histH))
-      const colT = (budget - (rows - 1) * KEY_GAP) / rows
+      const budget = Math.max(0, availH - chrome - histH)
+      const colT = Math.max(MIN_COL, (budget - (rows - 1) * KEY_GAP) / rows)
 
       const maxCardW = Math.max(0, availW - histW)
-      let W = W0 + COLS * (colT - col0)
+      let W = cols * colT + (cols - 1) * KEY_GAP + hExtras
       W = Math.min(W, maxCardW)
-      W = Math.max(W, Math.min(220, maxCardW))
+      W = Math.max(W, Math.min(240, maxCardW))
       W = Math.min(W, maxCardW)
 
       const rowW = desktop ? W + histW : W
@@ -150,7 +160,7 @@ function Calculator() {
       className="no-scrollbar flex h-full min-h-0 w-full items-center justify-center overflow-y-auto"
     >
       <div
-        className="flex w-full flex-col items-center gap-4 lg:flex-row lg:items-center"
+        className="flex w-full flex-col items-center gap-4 transition-[width] duration-300 ease-in-out lg:flex-row lg:items-center"
         style={fitW > 0 ? { width: `${fitW}px` } : undefined}
       >
         <div ref={cardRef} className="order-1 w-full lg:order-2">
