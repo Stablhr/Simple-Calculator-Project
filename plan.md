@@ -1,75 +1,90 @@
 # Calculator Website — Project Plan
 
 ## 1. Overview
-A responsive calculator web app built with **React** and **Tailwind CSS**, featuring a minimalist, aesthetic UI with a **glassmorphism** calculator panel floating over an **eye-catching gradient/dark background** (inspired by the two reference images: a frosted-glass calculator card, and a moody dark wallpaper with a soft light gradient sweep).
+A responsive calculator web app built with **React** and **Tailwind CSS**, featuring a **kawaii sticker** UI with a **BMO (Adventure Time) inspired palette** — a solid mint-green calculator card with thick dark outlines, puffy sticker keys, and a dark glowing screen, floating over a soft pastel striped background with drifting emoji shapes.
 
 ## 2. Goals
-- Fully functional calculator (basic + scientific-lite ops based on reference: `+ − × ÷ . = AC ⌫ e μ sin deg`)
-- Responsive across mobile, tablet, and desktop
-- Glass-effect (frosted/blurred) calculator card
-- Clean, distraction-free instructions/user guide section
-- Smooth interactivity: click + keyboard support, error handling, subtle animations
+- Fully functional calculator: basic operations plus a scientific-lite set (`sin cos tan ln log √ x² xʸ x! π e 1/x ±`, DEG/RAD)
+- Fit-to-screen responsive layout — no page scrolling, on mobile, tablet, and desktop
+- Sticker-style card: solid pastel fill, thick outline, puffy key shadows, squishy press feedback
+- Calculation history side panel (desktop) / below (mobile)
+- Clean header (name/section) and footer (GitHub link) framing the app
+- Smooth interactivity: click + keyboard support, graceful error handling, subtle animations
 
 ## 3. Tech Stack
 | Layer | Tool |
 |---|---|
-| UI Library | React (functional components + hooks) |
-| Styling | Tailwind CSS (utility classes, `backdrop-blur`, `bg-white/10` etc. for glass effect) |
-| State | `useState` / `useReducer` for calculator engine |
-| Logic | Custom expression evaluator (safe, no raw `eval`) |
-| Icons (optional) | lucide-react for AC/backspace icons |
+| UI Library | React 19 (functional components + hooks) |
+| Styling | Tailwind CSS v4 (`@theme` design tokens, utility classes) |
+| State | `useReducer` (`calculatorState.js`) + local `useState` for UI flourishes |
+| Logic | Custom expression evaluator — tokenizer + recursive-descent parser (no `eval`) |
+| Build | Vite + `@vitejs/plugin-react`, `@tailwindcss/vite` |
+| Lint / Test | oxlint, `node --test` (`tests/calculator.test.mjs`) |
 
 ## 4. Component Structure
 ```
 src/
- ├─ App.jsx                → page layout, background
+ ├─ App.jsx                → page shell: striped background, floating emojis,
+ │                           header (name + BSIT 3-3), footer (GitHub link)
  ├─ components/
- │   ├─ Calculator.jsx     → holds state, wires everything together
- │   ├─ Display.jsx        → shows expression + result
- │   ├─ Keypad.jsx         → renders buttons grid
- │   ├─ Button.jsx         → single reusable button (number/operator/action)
- │   └─ InstructionsPanel.jsx → "how to use" section
- └─ utils/
-     └─ calculate.js       → parses + evaluates expression safely
+ │   ├─ Calculator.jsx     → state owner (useReducer), keyboard listener,
+ │   │                       fit-to-screen sizing, face chip, mode toggle, history
+ │   ├─ Display.jsx        → expression line + result (auto-shrink, flash, aria-live)
+ │   ├─ Keypad.jsx         → declarative basic/sci button grids
+ │   ├─ Button.jsx         → sticker button (variants: digit/operator/equals/utility/function/toggle)
+ │   └─ (history panel inline in Calculator.jsx)
+ ├─ utils/
+ │   ├─ calculatorState.js → reducer: input/operator/equals/clear/backspace/
+ │   │                       angle/mode/wrap/history actions
+ │   └─ calculate.js       → safe tokenizer + parser + evaluator + formatResult
+ └─ index.css              → @theme BMO tokens, kawaii-bg stripes, keyframes
 ```
 
 ## 5. Core Features (React requirements)
-1. **Button click events** — numbers/operators append to the current expression in state.
-2. **Live calculation on `=`** — expression is parsed and evaluated, result replaces display.
+1. **Button click events** — digits/operators append to the current expression via reducer actions.
+2. **Live calculation on `=`** — expression parsed and evaluated; result replaces display; history entry pushed (max 12).
 3. **Clear / Reset (`AC`)** — resets expression and result to empty state.
 4. **Backspace (`⌫`)** — removes last character.
-5. **Keyboard support** — `keydown` listener maps digits, `+ - * /`, `Enter` (=), `Backspace`, `Escape` (AC).
-6. **Error handling** — divide-by-zero and malformed expressions show `Error` instead of crashing, with auto-reset on next input.
-7. **Animations/button effects** — `active:scale-95`, `transition`, subtle glow on `=` button, fade-in on result update.
+5. **Keyboard support** — global `keydown`: digits, `. ( ) ^ !`, `+ - * /`, `Enter` (=), `Backspace`, `Escape` (AC); modifier combos ignored.
+6. **Error handling** — divide-by-zero, invalid numbers, malformed expressions show red `Error` instead of crashing; next input starts fresh.
+7. **Basic / Sci mode toggle** — segmented pills switch keypad layouts (`aria-pressed`).
+8. **DEG/RAD toggle** — angle mode feeds the parser's trig functions.
+9. **History panel** — click an entry to reload its expression; Clear button; only rendered when non-empty.
+10. **Animations** — squishy key press (`translate-y + scale + shadow-none`), `equals-glow` pulse, happy-face wobble on `=`, result flash/slide-in.
 
 ## 6. Sections Required
-- **Calculator Interface (main page)**: display screen, digits 0–9, operators, decimal, AC, backspace, `=`.
-- **Instructions / User Guide**: short card or modal explaining supported operations (`+ − × ÷ .`), keyboard shortcuts, and how the display/result works.
+- **Header**: student name + `:)`, section subtitle (BSIT 3-3).
+- **Calculator card**: face chip → Basic/Sci toggle → display → tagline pill → keypad (sci block above the pad, or beside it on `lg+`).
+- **History card**: `✦ history` title, entries, Clear chip — left of calculator at `md+`, below on mobile.
+- **Footer**: GitHub project link.
 
 ## 7. Design Direction (from references)
-- **Image 1 (calculator UI)**: two stacked glass cards (light + dark variant), rounded-3xl corners, soft shadow, blue accent buttons for operators, `=` in solid blue with glow, numbers in translucent dark tiles.
-- **Image 2 (theme)**: dark, moody background with a soft diagonal light gradient (black → grey → white sweep), bold condensed typography accents, small scattered icon dots — used as inspiration for the **page background**, not the calculator card itself.
-- Combined direction: dark page background with a subtle animated gradient blob (blue glow, like image 1's background), calculator card uses `backdrop-blur-xl` + semi-transparent white/dark surface for the glass effect, blue accent color for operators/equals.
+- **Ref 1 (cute sticker calculator)**: cream/pastel rounded body, circular outlined keys, thick sketchy dark outline, vertical pastel-stripe background — emulated with `border-[3px]` + solid offset sticker shadows.
+- **Ref 2 (minimal face calculator)**: dot eyes + smile + blush built into the body, one standout `=` key, soft floating drop shadow.
+- **Combined + retheme**: kawaii sticker structure kept, palette swapped to **BMO green** (`#a8d8b9` body, `#1B2E2A` ink, dark screen with glowing `#c9f0d6` digits, coral operators `#d98b7a`, golden equals `#f2d06b`), pastel blue stripes, Fredoka type. See `design.md` for the full spec.
 
 ## 8. Responsiveness Plan
-- Mobile-first Tailwind breakpoints (`sm`, `md`, `lg`)
-- Calculator card: fixed max-width (`max-w-xs`/`sm`), centered with flexbox, scales padding/font-size per breakpoint
-- Buttons: CSS grid (`grid-cols-4`), aspect-square buttons so they scale proportionally
-- Instructions panel: stacks below calculator on mobile, side-by-side on larger screens (optional)
+- Fit-to-screen: `useLayoutEffect` + `ResizeObserver` measures available space and sizes keys/card so the whole app fits without scrolling (`body { overflow: hidden }`, `100dvh` shell).
+- History side panel at `≥768px`; sci keypad side-by-side with main pad at `≥1024px`; stacked below those breakpoints.
+- Auto-shrinking result text (`ResizeObserver` on the display) so long results never clip.
+- Mobile-first breakpoints (`sm`, `md`, `lg`) for font sizes and padding.
 
 ## 9. Build Steps
-1. Scaffold React app (Vite) + install Tailwind
-2. Build `Display` and static `Keypad` layout matching reference proportions
-3. Wire up state + calculation logic (`utils/calculate.js`)
-4. Add keyboard event support
-5. Add error handling (divide by zero, invalid expression)
-6. Apply glass-effect styling + gradient background
-7. Add button animations/transitions
-8. Build Instructions/User Guide section
-9. Test responsiveness across breakpoints
-10. Polish (favicon, meta title, final QA)
+1. Scaffold React app (Vite) + install Tailwind ✅
+2. Build `Display` and static `Keypad` layout ✅
+3. Wire up reducer state + calculation engine (`utils/calculate.js`) ✅
+4. Add keyboard event support ✅
+5. Add error handling (divide by zero, invalid expression) ✅
+6. Apply sticker styling + BMO palette + striped background ✅
+7. Add button animations, face reaction, result flash ✅
+8. Add Basic/Sci toggle, DEG/RAD, scientific keys ✅
+9. Add calculation history with reuse/clear ✅
+10. Fit-to-screen responsive sizing across breakpoints ✅
+11. Tests (`node --test`) + oxlint ✅
+12. Polish (stale `index.html` meta description/theme-color, favicon, final QA) ⬜
 
 ## 10. Stretch Goals (optional, time-permitting)
-- Light/dark theme toggle (echoing the two-tone calculator in image 1)
-- Calculation history list
-- Scientific functions (`sin`, `deg`, `e`, `μ` shown in reference) as a toggleable second row
+- Persist history to `localStorage`
+- Light/dark theme toggle
+- Copy result to clipboard
+- Memory keys (M+/MR)
