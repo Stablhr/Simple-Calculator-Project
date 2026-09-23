@@ -91,7 +91,7 @@ function Keypad({ mode, angle, press }) {
   const angleActive = angle === 'deg'
 
   return (
-    <div data-keypad className="space-y-3">
+    <div data-keypad className="flex items-stretch justify-center gap-3">
       {mode === 'scientific' && (
         <div className="space-y-3">
           {SCI_ROWS.map((row, idx) => (
