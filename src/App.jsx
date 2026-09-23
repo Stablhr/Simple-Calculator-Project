@@ -1,37 +1,29 @@
 import Calculator from './components/Calculator.jsx'
-import InstructionsPanel from './components/InstructionsPanel.jsx'
 
 function App() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-[#0B0F14] to-[#1A2230] text-white">
-      <div
-        className="calc-blob left-1/2 top-0 h-80 w-80 -translate-x-1/2 -translate-y-1/3 bg-blue-500/25"
-        style={{ filter: 'blur(80px)' }}
-      />
-      <div
-        className="calc-blob bottom-0 right-0 h-72 w-72 translate-x-1/3 translate-y-1/4 bg-blue-400/15"
-        style={{ filter: 'blur(90px)' }}
-      />
-      <div
-        className="calc-blob left-0 top-1/2 h-64 w-64 -translate-x-1/3 bg-sky-500/10"
-        style={{ filter: 'blur(70px)' }}
-      />
+    <div className="kawaii-bg relative min-h-screen overflow-hidden text-[#4E3B31]">
+      <span className="float-shape left-[8%] top-[10%] text-4xl opacity-60">☁️</span>
+      <span className="float-shape right-[10%] top-[14%] text-3xl opacity-50">💗</span>
+      <span className="float-shape left-[12%] bottom-[16%] text-3xl opacity-50">🌸</span>
+      <span className="float-shape right-[14%] bottom-[24%] text-4xl opacity-60">☁️</span>
+      <span className="float-shape left-[22%] top-[48%] text-2xl opacity-40">💫</span>
+      <span className="float-shape right-[20%] top-[55%] text-2xl opacity-40">🫧</span>
 
       <main className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-10">
-        <h1 className="mb-1 text-2xl font-extrabold tracking-tight sm:text-3xl">
-          Calculator
+        <h1 className="mb-2 font-display text-3xl font-bold tracking-tight text-[#4E3B31] drop-shadow-sm sm:text-4xl">
+          Samson, Aries B.<span className="text-[#FF8A8A]"> :)</span>
         </h1>
-        <p className="mb-6 text-sm text-white/40">Frosted glass on a glowing dark canvas</p>
+        <p className="mb-6 text-sm font-medium text-[#B089A0]">BSIT 3-3</p>
         <Calculator />
-        <InstructionsPanel />
       </main>
 
-      <footer className="relative z-10 pb-6 text-center text-xs text-white/30">
+      <footer className="relative z-10 pb-6 text-center text-xs font-medium text-[#C9A6B5]">
         <a
           href="https://github.com/Stablhr/Simple-Calculator-Project"
           target="_blank"
           rel="noreferrer"
-          className="transition duration-150 hover:text-white/60"
+          className="transition duration-150 hover:text-[#FF8A8A]"
         >
           Simple Calculator Project
         </a>

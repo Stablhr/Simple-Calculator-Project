@@ -53,7 +53,7 @@ const MAIN_ROWS = [
     { label: '\u2212', key: '-', variant: 'operator' },
   ],
   [
-    { label: '0', key: '0', className: 'col-span-2' },
+    { label: '0', key: '0', className: 'col-span-2', wide: true },
     { label: '.', key: '.' },
     { label: '=', key: '=', variant: 'equals' },
   ],
@@ -119,6 +119,7 @@ function Keypad({ mode, angle, press }) {
                 onClick={() => handle(btn)}
                 variant={toVariant(btn)}
                 className={btn.className}
+                wide={btn.wide}
               />
             ))}
           </div>

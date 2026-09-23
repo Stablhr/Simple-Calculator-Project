@@ -1,9 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 
 @theme {
-  --font-sans:
-    Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
-    sans-serif;
+  --font-display: 'Fredoka', 'Quicksand', system-ui, sans-serif;
+  --font-sans: 'Fredoka', 'Quicksand', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --color-mint: #bff3d1;
+  --color-mint-dark: #a9edc2;
+  --color-butter: #ffe29a;
+  --color-butter-dark: #ffd873;
+  --color-coral: #ff9a62;
+  --color-coral-dark: #ff8a50;
+  --color-blush: #ffd9e8;
+  --color-blush-dark: #ffc9de;
+  --color-lavender: #e4dbff;
+  --color-lavender-dark: #d8cbfd;
 }
 
 html,
@@ -19,20 +30,50 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.calc-blob {
+.kawaii-bg {
+  background: repeating-linear-gradient(
+    90deg,
+    #ffe3ef 0px,
+    #ffe3ef 110px,
+    #ffd6e9 110px,
+    #ffd6e9 220px
+  );
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+.float-shape {
   position: absolute;
-  border-radius: 9999px;
   pointer-events: none;
+  user-select: none;
+  animation: floaty 6s ease-in-out infinite;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes result-in {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(5px) scale(0.97);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -40,13 +81,34 @@ body {
   animation: result-in 0.2s ease-out;
 }
 
+@keyframes wobble {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-4deg) scale(1.08);
+  }
+  75% {
+    transform: rotate(4deg) scale(1.08);
+  }
+}
+
+.face-happy {
+  animation: wobble 0.35s ease-in-out;
+}
+
 @keyframes equals-glow {
   0%,
   100% {
-    box-shadow: 0 0 18px 2px rgba(96, 165, 250, 0.45);
+    box-shadow:
+      0 4px 0 #c96b2e,
+      0 0 12px 2px rgba(255, 154, 98, 0.5);
   }
   50% {
-    box-shadow: 0 0 26px 6px rgba(96, 165, 250, 0.65);
+    box-shadow:
+      0 4px 0 #c96b2e,
+      0 0 20px 6px rgba(255, 154, 98, 0.75);
   }
 }
 
