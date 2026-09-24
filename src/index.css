@@ -161,6 +161,10 @@ button {
     display: none;
   }
 
+  .chip-row {
+    display: none;
+  }
+
   .card-pad {
     padding: 0.75rem;
   }
@@ -170,13 +174,13 @@ button {
     margin-bottom: 0.5rem;
   }
 
-  .chip-row {
-    margin-bottom: 0;
+  .screen-result {
+    font-size: 1.5rem;
   }
 
   :root {
     --fit-gap: 8px;
-    --fit-min-key: 36px;
+    --fit-min-key: 24px;
   }
 }
 

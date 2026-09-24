@@ -63,7 +63,7 @@ const MAIN_ROWS = [
 const FUNC_KEYS = ['sin', 'cos', 'tan', 'ln', 'log', 'sqrt']
 const SCI_ACTIONS = new Set(['angle', 'square', 'power', 'factorial', 'reciprocal', 'negate'])
 
-function Keypad({ mode, angle, press }) {
+function Keypad({ mode, angle, press, sideBySide = false, compact = false }) {
   const toVariant = ({ variant, key }) => {
     if (variant) return variant
     if (FUNC_KEYS.includes(key) || SCI_ACTIONS.has(key)) return 'function'
@@ -90,11 +90,18 @@ function Keypad({ mode, angle, press }) {
   }
 
   const angleActive = angle === 'deg'
+  const horizontal = sideBySide && mode === 'scientific'
 
   return (
-    <div data-keypad className="flex flex-col items-stretch justify-center gap-[var(--fit-gap)] lg:flex-row">
+    <div
+      data-keypad
+      className={[
+        'flex items-stretch justify-center gap-[var(--fit-gap)]',
+        horizontal ? 'flex-row' : 'flex-col',
+      ].join(' ')}
+    >
       {mode === 'scientific' && (
-        <div className="space-y-[var(--fit-gap)] lg:flex-1">
+        <div className={['space-y-[var(--fit-gap)]', horizontal ? 'flex-1' : ''].join(' ')}>
           {SCI_ROWS.map((row, idx) => (
             <div key={idx} className="grid grid-cols-4 gap-[var(--fit-gap)]">
               {row.map((btn, i) => (
@@ -104,13 +111,14 @@ function Keypad({ mode, angle, press }) {
                   onClick={() => handle(btn)}
                   variant={btn.toggle ? 'toggle' : toVariant(btn)}
                   active={btn.toggle && angleActive}
+                  compact={compact}
                 />
               ))}
             </div>
           ))}
         </div>
       )}
-      <div className="space-y-[var(--fit-gap)] lg:flex-1">
+      <div className={['space-y-[var(--fit-gap)]', horizontal ? 'flex-1' : ''].join(' ')}>
         {MAIN_ROWS.map((row, idx) => (
           <div key={idx} className="grid grid-cols-4 gap-[var(--fit-gap)]">
             {row.map((btn, i) => (
@@ -121,6 +129,7 @@ function Keypad({ mode, angle, press }) {
                 variant={toVariant(btn)}
                 className={btn.className}
                 wide={btn.wide}
+                compact={compact}
               />
             ))}
           </div>

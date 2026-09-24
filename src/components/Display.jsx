@@ -62,7 +62,7 @@ function Display({ expression, display, isError }) {
         ref={textRef}
         aria-live="polite"
         className={
-          'font-display w-full whitespace-nowrap text-right text-3xl font-bold leading-normal text-bmo-glow sm:text-4xl md:text-5xl ' +
+          'screen-result font-display w-full whitespace-nowrap text-right text-3xl font-bold leading-normal text-bmo-glow sm:text-4xl md:text-5xl ' +
           (flash ? 'result-animate ' : '') +
           (isError ? 'text-red-400' : '')
         }

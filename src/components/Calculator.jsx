@@ -13,6 +13,7 @@ function Calculator() {
   const [state, dispatch] = useReducer(reducer, initialState)
   const [happy, setHappy] = useState(false)
   const [fitW, setFitW] = useState(0)
+  const [layout, setLayout] = useState({ sideBySide: false, compact: false })
   const spaceRef = useRef(null)
   const cardRef = useRef(null)
   const historyRef = useRef(null)
@@ -99,11 +100,8 @@ function Calculator() {
       const availW = space.clientWidth
       const availH = space.clientHeight
       const histSide = window.matchMedia('(min-width: 768px)').matches
-      const sciSide = window.matchMedia('(min-width: 1024px)').matches
+      const WIDE = window.matchMedia('(min-width: 1024px)').matches
       const isSci = mode === 'scientific'
-      const sideBySide = isSci && sciSide
-      const cols = sideBySide ? 8 : 4
-      const rows = isSci && !sciSide ? 9 : 5
 
       const cardRect = card.getBoundingClientRect()
       const keypadRect = keypad.getBoundingClientRect()
@@ -122,10 +120,24 @@ function Calculator() {
         }
       }
 
-      const budget = Math.max(0, availH - chrome - histH)
       const keyGap = readCssVar('--fit-gap', 12)
       const minCol = readCssVar('--fit-min-key', 44)
-      const colT = Math.max(minCol, (budget - (rows - 1) * keyGap) / rows)
+      const room = Math.max(0, availH - chrome - histH)
+
+      const sideKeyW = (availW - hExtras - 7 * keyGap) / 8
+      const useSide = isSci && (WIDE || sideKeyW >= 26)
+      const compact = useSide && !WIDE
+
+      setLayout((prev) =>
+        prev.sideBySide === useSide && prev.compact === compact
+          ? prev
+          : { sideBySide: useSide, compact }
+      )
+
+      const cols = useSide ? 8 : 4
+      const rows = isSci && !useSide ? 9 : 5
+
+      const colT = Math.max(minCol, (room - (rows - 1) * keyGap) / rows)
 
       const maxCardW = Math.max(0, availW - histW)
       let W = cols * colT + (cols - 1) * keyGap + hExtras
@@ -141,7 +153,7 @@ function Calculator() {
     const observer = new ResizeObserver(measure)
     observer.observe(space)
     return () => observer.disconnect()
-  }, [mode, history.length])
+  }, [mode, history.length, layout.sideBySide])
 
   const modeBtn = (m, label) => (
     <button
@@ -199,7 +211,7 @@ function Calculator() {
           <span className="rounded-full bg-white/70 px-2 py-0.5">stress na ko ⊙‿⊙</span>
         </div>
 
-        <Keypad mode={mode} angle={angle} press={handlePress} />
+        <Keypad mode={mode} angle={angle} press={handlePress} sideBySide={layout.sideBySide} compact={layout.compact} />
         </div>
       </div>
 
