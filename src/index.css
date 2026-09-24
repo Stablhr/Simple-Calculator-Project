@@ -36,6 +36,11 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  touch-action: manipulation;
 }
 
 .kawaii-bg {
@@ -46,6 +51,77 @@ body {
     #ddebf4 110px,
     #ddebf4 220px
   );
+}
+
+.app-shell {
+  height: 100vh;
+  height: 100dvh;
+}
+
+.app-header {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
+}
+
+@media (min-width: 640px) {
+  .app-header {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 1rem);
+  }
+}
+
+.app-footer {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.75rem);
+}
+
+:root {
+  --fit-gap: 12px;
+  --fit-min-key: 44px;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --fit-gap: 8px;
+  }
+}
+
+@media (max-height: 560px) {
+  .app-header {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 0.35rem);
+  }
+
+  .app-header h1 {
+    margin-bottom: 0.1rem;
+    font-size: 1rem;
+  }
+
+  .app-header p {
+    margin-bottom: 0.1rem;
+    font-size: 0.7rem;
+  }
+
+  .app-footer {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.3rem);
+  }
+
+  .app-footer a {
+    font-size: 0.65rem;
+  }
+
+  .tagline {
+    display: none;
+  }
+
+  .card-pad {
+    padding: 1rem;
+  }
+
+  .screen-min {
+    min-height: 3.75rem;
+  }
+
+  :root {
+    --fit-gap: 8px;
+    --fit-min-key: 36px;
+  }
 }
 
 @keyframes floaty {

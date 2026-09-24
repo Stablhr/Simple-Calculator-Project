@@ -3,8 +3,11 @@ import Display from './Display.jsx'
 import Keypad from './Keypad.jsx'
 import { initialState, reducer } from '../utils/calculatorState.js'
 
-const KEY_GAP = 12
-const MIN_COL = 44
+const readCssVar = (name, fallback) => {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+  const value = parseFloat(raw)
+  return Number.isFinite(value) ? value : fallback
+}
 
 function Calculator() {
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -120,10 +123,12 @@ function Calculator() {
       }
 
       const budget = Math.max(0, availH - chrome - histH)
-      const colT = Math.max(MIN_COL, (budget - (rows - 1) * KEY_GAP) / rows)
+      const keyGap = readCssVar('--fit-gap', 12)
+      const minCol = readCssVar('--fit-min-key', 44)
+      const colT = Math.max(minCol, (budget - (rows - 1) * keyGap) / rows)
 
       const maxCardW = Math.max(0, availW - histW)
-      let W = cols * colT + (cols - 1) * KEY_GAP + hExtras
+      let W = cols * colT + (cols - 1) * keyGap + hExtras
       W = Math.min(W, maxCardW)
       W = Math.max(W, Math.min(240, maxCardW))
       W = Math.min(W, maxCardW)
@@ -166,7 +171,7 @@ function Calculator() {
       >
         <div ref={cardRef} className="order-1 w-full md:order-2">
           <div
-            className="w-full rounded-[2.5rem] border-[3px] border-[#1B2E2A] bg-bmo-body p-5 sm:p-6"
+            className="card-pad w-full rounded-[2.5rem] border-[3px] border-[#1B2E2A] bg-bmo-body p-5 sm:p-6"
         style={{ boxShadow: '0 18px 35px -12px rgba(27, 46, 42, 0.35)' }}
       >
         <div className="mb-1 flex items-center justify-center">
@@ -190,7 +195,7 @@ function Calculator() {
         <div className="mb-4 mt-3 flex gap-2">{modeBtn('basic', 'Basic')}{modeBtn('scientific', 'Sci')}</div>
         <Display expression={expr} display={displayText} isError={isError} />
 
-        <div className="mb-4 flex justify-between text-xs font-medium text-[#5C7A72]">
+        <div className="tagline mb-4 flex justify-between text-xs font-medium text-[#5C7A72]">
           <span className="rounded-full bg-white/70 px-2 py-0.5">stress na ko ⊙‿⊙</span>
         </div>
 
