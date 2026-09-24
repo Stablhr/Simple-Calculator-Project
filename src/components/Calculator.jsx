@@ -174,8 +174,8 @@ function Calculator() {
             className="card-pad w-full rounded-[2.5rem] border-[3px] border-[#1B2E2A] bg-bmo-body p-5 sm:p-6"
         style={{ boxShadow: '0 18px 35px -12px rgba(27, 46, 42, 0.35)' }}
       >
-        <div className="mb-1 flex items-center justify-center">
-          <div className="flex items-center gap-2 rounded-full border-[3px] border-[#1B2E2A] bg-white px-4 py-2">
+        <div className="chip-row mb-1 flex items-center justify-center">
+          <div className="chip flex items-center gap-2 rounded-full border-[3px] border-[#1B2E2A] bg-white px-4 py-2">
             {happy ? (
               <span className="face-happy inline-flex items-center gap-1.5">
                 <span className="h-2.5 w-2.5 rounded-full border-[2px] border-[#1B2E2A] bg-bmo-ink" />
@@ -192,10 +192,10 @@ function Calculator() {
           </div>
         </div>
 
-        <div className="mb-4 mt-3 flex gap-2">{modeBtn('basic', 'Basic')}{modeBtn('scientific', 'Sci')}</div>
+        <div className="mode-row mb-4 mt-3 flex gap-2">{modeBtn('basic', 'Basic')}{modeBtn('scientific', 'Sci')}</div>
         <Display expression={expr} display={displayText} isError={isError} />
 
-        <div className="tagline mb-4 flex justify-between text-xs font-medium text-[#5C7A72]">
+        <div className="tagline mb-4 hidden justify-between text-xs font-medium text-[#5C7A72] md:flex">
           <span className="rounded-full bg-white/70 px-2 py-0.5">stress na ko ⊙‿⊙</span>
         </div>
 
